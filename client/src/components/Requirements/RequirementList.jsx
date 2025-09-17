@@ -114,6 +114,12 @@ export default function RequirementList({ user }) {
 
   return (
     <div className="main-container">
+      {sidebarOpen && (
+        <div
+          className="sidebar-backdrop"
+          onClick={handleFilterClose}
+        />
+      )}
       {/* Sidebar */}
       <div className={`sidebar ${sidebarOpen ? "sidebar-open" : ""}`}>
         <div className="sidebar-header">
