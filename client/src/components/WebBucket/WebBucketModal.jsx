@@ -27,7 +27,7 @@ export default function WebBucketModal({ open, onClose, initial, onSave }) {
           <form onSubmit={(e) => { e.preventDefault(); onSave({ title, link, image }); }}>
             <input type="text" placeholder="Website Title" value={title} onChange={e => setTitle(e.target.value)} required />
             <input type="url" placeholder="Website Link" value={link} onChange={e => setLink(e.target.value)} required />
-            <input type="url" placeholder="Image URL" value={image} onChange={e => setImage(e.target.value)} required />
+            <input type="url" placeholder="Image URL (optional)" value={image} onChange={e => setImage(e.target.value)} />
             <button type="submit">{initial ? "Save Changes" : "Add Store"}</button>
           </form>
         </div>
