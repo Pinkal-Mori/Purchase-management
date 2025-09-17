@@ -1,0 +1,354 @@
+
+.main-container {
+    display: flex;
+    min-height: 100vh;
+}
+.content {
+    flex-grow: 1;
+    padding: 30px;
+    transition: padding-right 0.3s ease-in-out;
+}
+.header2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+.back-btn {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #ff2424;
+    font-weight: bold;
+    transition: color 0.2s;
+}
+.back-btn:hover {
+    color: #b40303;
+}
+.back-btn i {
+    margin-right: 5px;
+}
+.header-center {
+    flex-grow: 1;
+    text-align: center;
+}
+.header-center h2 {
+    color: black;
+}
+.header-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+.add-btn-container button {
+    padding: 10px 18px;
+    color: #ff2424;
+    border: 1px solid #ff2424;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    background-color: white;
+}
+
+.add-btn-container {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.filter-btn {
+    color: #ff2424;
+    border:1px solid #ff2424;
+    padding: 0.5rem;
+    background-color: white;
+}
+.filter-icon-container {
+    padding: 10px;
+    cursor: pointer;
+    margin-right: 15px;
+}
+.filter-icon {
+    font-size: 24px;
+    color: #ff2424;
+}
+
+#requirementList {
+    margin-top: 40px;
+    /* width: 90vw; */
+    margin: 0 auto;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 8px;
+    overflow:scroll;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+}
+td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid red;
+    font-size: 14px;
+}
+th {
+    background-color: rgb(246, 227, 227);
+    color: black;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 1px solid red;
+    font-size: 16px;
+    padding: 12px 14px;
+}
+tr:hover {
+    background-color: #f9fbfc;
+}
+td a {
+    color: rgb(94, 94, 218);
+    text-decoration: none;
+}
+td a:hover {
+    text-decoration: underline;
+}
+.ref-id-cell {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+td select {
+    padding: 6px 8px;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 100%;
+}
+td input[type="text"] {
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin:0px;
+}
+td input[type="number"] {
+    margin-bottom: 0;
+    padding:6px 8px;
+}
+.actions-cell {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.actions-cell button {
+    padding: 6px 10px;
+    font-size: 14px;
+    border-radius: 8px;
+    box-shadow: none;
+    background-color: white;
+    border: 1px solid #ff2424;
+}
+.actions-cell button:hover {
+    opacity: 0.8;
+}
+
+/* Modal માટે સ્ટાઇલ */
+.modal2 {
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease-in-out;
+}
+.modal-content2 {
+    background-color: white;
+    padding: 30px;
+    width: 90%;
+    max-width: 370px;
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-out;
+}
+.modal-content2 h3 {
+    margin-bottom: 20px;
+    color: black;
+    font-size: 22px;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+}
+.modal-content2 input,
+.modal-content2 textarea,.modal-content2 select {
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    background-color: #fff;
+    transition: border-color 0.3s ease;
+}
+.modal-content2 input:focus,
+.modal-content2 textarea:focus {
+    border-color: #ff2424;
+    outline: none;
+}
+.modal-content2 input[disabled] {
+    background-color: #f0f0f0;
+    color: #555;
+}
+.input-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+label {
+    margin-bottom: 6px;
+    color: black;
+    display: block;
+}
+input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: 0.2s;
+}
+input::placeholder {
+    color: #aaa;
+}
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+.actions button {
+    border: 1px solid #ff2424;
+    padding: 10px 2rem;
+    background-color: #ff2424;
+    color: white;
+    border-radius: 8px;
+}
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    background-color: white;
+    padding: 20px;
+    /* border-left: 1px solid #ff2424; */
+    display: flex;
+    flex-direction: column;
+    /* gap: 20px; */
+    transition: transform 0.3s ease-in-out;
+    /* height: 100%; */
+    z-index: 100;
+    transform: translateX(100%);
+    /* box-shadow: 0 -25px 50px rgba(0, 0, 0, 0.1); */
+}
+.sidebar-open {
+    transform: translateX(0); 
+}
+.sidebar-header {
+    border-bottom: 1px solid #ff2424;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+.sidebar h3 {
+    color: black;
+}
+.close-sidebar {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+}
+.close-sidebar:hover {
+    color: black;
+}
+.filters {
+    display: flex;
+    flex-direction: column;
+}
+.filter-group {
+    border-bottom: 1px solid #eee;
+}
+.filter-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    cursor: pointer;
+    font-weight: bold;
+    color: #555;
+}
+.filter-content {
+    display: none;
+    padding: 5px 0;
+}
+.filter-content.active {
+    display: block;
+}
+.filters input,
+.filters select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+.filter-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+.filter-actions button {
+    width: 50%;
+    background-color: white;
+    padding: 8px 0;
+    color: #ff2424;
+    border: 1px solid #ff2424;
+    border-radius: 8px;
+}
+/* ટેબલ નાનું કરવા માટે */
+.content.shrunk {
+    padding-right: 280px;
+
+}
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@media screen and (max-width:500px){
+    .header-center h2 {
+    font-size: 20px;
+}
+}
+.row-white { background-color: #f7f6f6; }    /* never viewed */
+.row-yellow { background-color: #eed80f; }   /* viewed by current user */
+.row-green { background-color: #c4efc1; }    /* order placed */
+
+/* Condition	Color
+Row user khud add kari che + not viewed yet	White
+Row user khud add kari che + viewed	Yellow
+Order placed (orderId exists)	Green */
