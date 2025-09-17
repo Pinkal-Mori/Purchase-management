@@ -11,6 +11,7 @@ export default function Login({ onSwitch }) {
   const [loginId, setLoginId] = useState(""); // ✅ for email or contact number
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -26,7 +27,10 @@ export default function Login({ onSwitch }) {
       if (status === 404) {
         toast.error("Don't have an account? Please sign up first.");
       } else if (status === 400) {
-        if (message?.toLowerCase().includes("password")) {
+        // Here's the new logic
+        if (message && message.includes("Google વડે સાઇનઅપ કર્યું છે")) {
+          toast.info("You signed up with Google. Please use the Google login button.");
+        } else if (message?.toLowerCase().includes("password")) {
           toast.error("Invalid password.");
         } else if (message?.toLowerCase().includes("required")) {
           toast.error("Email/Contact and password are required.");
@@ -74,7 +78,7 @@ export default function Login({ onSwitch }) {
 
       <div className="social-login">
         <div className="or-divider">Or</div>
-       <GoogleButton />
+        <GoogleButton />
       </div>
     </div>
   );

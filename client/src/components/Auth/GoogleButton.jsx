@@ -18,15 +18,22 @@ export default function GoogleButton() {
             setUser(res.data.user);
             toast.success("Logged in with Google!");
           } catch (err) {
+            const message = err.response?.data?.message || "Google login failed";
             console.error("Google login failed:", err);
-            toast.error("Google login failed");
+
+            // Here's the new logic to handle a specific error from the backend.
+            if (message.includes("Google વડે સાઇનઅપ કર્યું છે")) {
+              toast.info("This email is already registered with a password. Please log in using your email and password.");
+            } else {
+              toast.error(message);
+            }
           }
         }}
         onError={() => {
           toast.error("Google login failed");
         }}
-        width="100%" // optional: full width button
-        text="continue_with" // optional: button text style
+        width="100%"
+        text="continue_with"
       />
     </div>
   );

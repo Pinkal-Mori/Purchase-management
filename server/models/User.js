@@ -1,3 +1,4 @@
+// user.js
 import mongoose from "mongoose";
 
 const BucketSchema = new mongoose.Schema({
@@ -13,7 +14,18 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: false },
   profileImage: String,
-  customWebsiteBuckets: [BucketSchema]
+  customWebsiteBuckets: [BucketSchema],
+  // અહીં નવા ફીલ્ડ ઉમેરવામાં આવ્યા છે
+  signup_method: { 
+    type: String, 
+    required: true, 
+    enum: ['email', 'google'] 
+  },
+  googleId: { 
+    type: String, 
+    unique: true, 
+    sparse: true 
+  }
 }, { timestamps: true });
 
 export const User = mongoose.model("User", UserSchema);

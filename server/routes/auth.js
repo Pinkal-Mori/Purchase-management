@@ -19,6 +19,7 @@ function signToken(user) {
 }
 
 // ✅ SIGNUP
+// ...
 router.post("/signup", async (req, res) => {
   try {
     const { name, contact, email, password } = req.body;
@@ -33,11 +34,16 @@ router.post("/signup", async (req, res) => {
         .json({ message: "Password must be at least 6 characters long." });
     }
 
-    const exists = await User.findOne({ $or: [{ email }, { contact }] });
-    if (exists) {
-      return res
-        .status(400)
-        .json({ message: "Email or contact already exists." });
+    // અહીં સુધારો છે:
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      if (existingUser.signup_method === 'google') {
+        return res.status(400).json({
+          message: "તમે Google વડે સાઇનઅપ કર્યું છે. કૃપા કરીને Google વડે લોગિન કરો."
+        });
+      }
+      return res.status(400).json({ message: "આ ઇમેઇલ પહેલેથી જ રજીસ્ટર થયેલું છે." });
     }
 
     const hashed = await bcrypt.hash(password, 10);
@@ -46,6 +52,7 @@ router.post("/signup", async (req, res) => {
       contact,
       email,
       password: hashed,
+      signup_method: 'email', // અહીં નવું ફીલ્ડ ઉમેર્યું
       customWebsiteBuckets: [],
     });
 
@@ -63,12 +70,13 @@ router.post("/signup", async (req, res) => {
       },
     });
   } catch (e) {
-    console.error("Signup Error:", e); // 🐞 Debug log
+    console.error("Signup Error:", e);
     res.status(500).json({ message: "Something went wrong during signup." });
   }
 });
 
 // ✅ LOGIN (with email or contact)
+// ...
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -87,6 +95,13 @@ router.post("/login", async (req, res) => {
       return res
         .status(404)
         .json({ message: "You don't have an account. Please sign up." });
+    }
+
+    // અહીં સુધારો છે:
+    if (user.signup_method === 'google') {
+      return res.status(400).json({
+        message: "તમે Google વડે સાઇનઅપ કર્યું છે. કૃપા કરીને Google વડે લોગિન કરો."
+      });
     }
 
     const ok = await bcrypt.compare(password, user.password);
@@ -108,16 +123,19 @@ router.post("/login", async (req, res) => {
       },
     });
   } catch (e) {
-    console.error("Login Error:", e); // 🐞 Debug log
-    res.status(500).json({ message: "Something went wrong during login." ,
+    console.error("Login Error:", e);
+    res.status(500).json({
+      message: "Something went wrong during login.",
       detail: e.message
     });
   }
 });
+// ...
 // POST /auth/google-login
+// ...
 router.post("/google-login", async (req, res) => {
   try {
-    const { tokenId } = req.body; // token sent from frontend
+    const { tokenId } = req.body;
 
     const ticket = await client.verifyIdToken({
       idToken: tokenId,
@@ -125,14 +143,16 @@ router.post("/google-login", async (req, res) => {
     });
 
     const payload = ticket.getPayload();
-    const { email, name, picture } = payload;
+    const { email, name, picture, sub } = payload; // 'sub' એ Google ID છે
 
     let user = await User.findOne({ email });
     if (!user) {
       user = await User.create({
         name,
         email,
-        password: "", // No password for Google login
+        password: null, // પાસવર્ડને null રાખો
+        signup_method: 'google', // અહીં નવું ફીલ્ડ ઉમેર્યું
+        googleId: sub, // Google ID સ્ટોર કરો
         profileImage: picture,
       });
     }

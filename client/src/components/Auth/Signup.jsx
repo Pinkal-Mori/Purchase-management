@@ -19,8 +19,15 @@ export default function Signup({ onSwitch }) {
       await signup({ name, contact, email, password });
       toast.success("Signup successful!");
       // redirect or close modal here
-    } catch (e) {
-      toast.error(e.message || "Signup failed");
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || "Signup failed";
+      
+      // Here's the new logic to handle the specific backend message
+      if (message.includes("Google વડે સાઇનઅપ કર્યું છે")) {
+        toast.info("This email is already registered with Google. Please use the Google Sign-up button.");
+      } else {
+        toast.error(message);
+      }
     }
   };
 
@@ -77,7 +84,7 @@ export default function Signup({ onSwitch }) {
 
       <div className="social-login">
         <div className="or-divider">Or</div>
-       <GoogleButton />
+        <GoogleButton />
       </div>
     </div>
   );
