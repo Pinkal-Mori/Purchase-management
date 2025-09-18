@@ -66,6 +66,7 @@ router.post("/signup", async (req, res) => {
         email: user.email,
         contact: user.contact,
         profileImage: user.profileImage,
+        signup_method: user.signup_method,
         customWebsiteBuckets: user.customWebsiteBuckets,
       },
     });
@@ -119,6 +120,7 @@ router.post("/login", async (req, res) => {
         email: user.email,
         contact: user.contact,
         profileImage: user.profileImage,
+        signup_method: user.signup_method,
         customWebsiteBuckets: user.customWebsiteBuckets,
       },
     });
@@ -170,6 +172,7 @@ router.post("/google-login", async (req, res) => {
         name: user.name,
         email: user.email,
         profileImage: user.profileImage,
+        signup_method: user.signup_method,
       },
     });
   } catch (e) {
@@ -193,6 +196,7 @@ router.get("/me", auth, async (req, res) => {
         email: user.email,
         contact: user.contact,
         profileImage: user.profileImage,
+        signup_method: user.signup_method,
         customWebsiteBuckets: user.customWebsiteBuckets,
       },
     });
@@ -209,6 +213,10 @@ router.post("/password", auth, async (req, res) => {
 
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found." });
+
+    if (user.signup_method === 'google') {
+      return res.status(400).json({ message: "Password is managed by Google account." });
+    }
 
     const ok = await bcrypt.compare(oldPassword, user.password);
     if (!ok) return res.status(400).json({ message: "Incorrect old password" });

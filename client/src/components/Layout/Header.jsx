@@ -102,14 +102,23 @@ const handleModalClick = (e) => {
                 <input type="file" accept="image/*" onChange={onUpload} />
                 {user?.profileImage && (<img id="previewProfilePic" className="profile-pic-preview" src={user.profileImage} />)}
 
-                <h3>Change Password</h3>
-                <form onSubmit={savePassword}>
-                  <input type="password" placeholder="Old Password" value={oldPassword} onChange={e=>setOldPassword(e.target.value)} required />
-                  <input type="password" placeholder="New Password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} required />
-                  <input type="password" placeholder="Confirm New Password" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} required />
-                  <button type="submit">Update Password</button>
-                  <p id="password-message" className="message">{msg}</p>
-                </form>
+                {user?.signup_method !== 'google' ? (
+                  <>
+                    <h3>Change Password</h3>
+                    <form onSubmit={savePassword}>
+                      <input type="password" placeholder="Old Password" value={oldPassword} onChange={e=>setOldPassword(e.target.value)} required />
+                      <input type="password" placeholder="New Password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} required />
+                      <input type="password" placeholder="Confirm New Password" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} required />
+                      <button type="submit">Update Password</button>
+                      <p id="password-message" className="message">{msg}</p>
+                    </form>
+                  </>
+                ) : (
+                  <>
+                    <h3>Password</h3>
+                    <p>You're signed in with Google. Manage your password in your Google Account.</p>
+                  </>
+                )}
               </div>
             </div>
           </div>
