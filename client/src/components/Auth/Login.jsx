@@ -4,13 +4,19 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
 import GoogleButton from "./GoogleButton";
+import { useNavigate } from "react-router-dom";
+import api from "../../api/axios";
 
 export default function Login({ onSwitch }) {
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const [loginId, setLoginId] = useState(""); // ✅ for email or contact number
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [showForgot, setShowForgot] = useState(false);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -76,10 +82,58 @@ export default function Login({ onSwitch }) {
         </button>
       </form>
 
+      <div style={{ marginTop: 10, textAlign: "right" }}>
+        <button
+          type="button"
+          style={{ background: "transparent", color: "#555", textDecoration: "underline", cursor: "pointer", border: 0, padding: 0 }}
+          onClick={() => setShowForgot(true)}
+        >
+          Forgot password?
+        </button>
+      </div>
+
       <div className="social-login">
         <div className="or-divider">Or</div>
         <GoogleButton />
       </div>
+
+      {showForgot && (
+        <div className="modal" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50 }}>
+          <div style={{ background: "#fff", padding: 20, borderRadius: 8, width: 360, maxWidth: "90%" }}>
+            <h3 style={{ margin: 0, marginBottom: 12 }}>Reset your password</h3>
+            <p style={{ marginTop: 0, color: "#666" }}>Enter your account email to receive an OTP.</p>
+            <input
+              type="email"
+              placeholder="Email"
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              style={{ width: "100%", padding: 10, marginTop: 8 }}
+            />
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
+              <button onClick={() => setShowForgot(false)} className="btn" style={{ background: "#eee", color: "#333" }}>Cancel</button>
+              <button
+                className="btn"
+                disabled={isSending || !forgotEmail}
+                onClick={async () => {
+                  try {
+                    setIsSending(true);
+                    await api.post("/auth/forgot-password", { email: forgotEmail });
+                    toast.success("If that account exists, an OTP has been sent to your email.");
+                    setShowForgot(false);
+                    navigate("/reset-password", { state: { email: forgotEmail } });
+                  } catch (e) {
+                    toast.error(e.response?.data?.message || "Failed to send OTP");
+                  } finally {
+                    setIsSending(false);
+                  }
+                }}
+              >
+                {isSending ? "Sending..." : "Send OTP"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

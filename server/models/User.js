@@ -25,7 +25,10 @@ const UserSchema = new mongoose.Schema({
     type: String, 
     unique: true, 
     sparse: true 
-  }
+  },
+  // OTP password reset support
+  resetPasswordOTP: { type: String, required: false },
+  resetPasswordOTPExpiresAt: { type: Date, required: false }
 }, { timestamps: true });
 
 export const User = mongoose.model("User", UserSchema);
