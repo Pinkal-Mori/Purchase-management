@@ -17,7 +17,7 @@ function parseRef(refId) {
 
 export default function RequirementList({ user }) {
   const [items, setItems] = useState([]);
-  const [filters, setFilters] = useState({ user: "", date: "", status: "", month: "", year: new Date().getFullYear().toString() }); // 🆕 default year
+  const [filters, setFilters] = useState({ user: "", date: "", status: "", month: "", year: "" }); // 🆕 default year is now empty string
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
@@ -36,13 +36,26 @@ export default function RequirementList({ user }) {
     fetchUsers();
   }, []);
 
+  // 🆕 Function to get all unique years from the data
+  const getAllYears = () => {
+    const years = new Set();
+    items.forEach(item => {
+      if (item.date) {
+        years.add(new Date(item.date).getFullYear());
+      }
+    });
+    // Add the current year if it's not already in the data
+    years.add(new Date().getFullYear());
+    return Array.from(years).sort((a, b) => a - b);
+  };
+
   async function load() {
     const params = {};
     if (filters.user) params.user = filters.user;
     if (filters.date) params.date = filters.date;
     if (filters.status) params.status = filters.status;
-    if (filters.month) params.month = filters.month; // 🆕
-    if (filters.year) params.year = filters.year;   // 🆕
+    if (filters.month) params.month = filters.month; 
+    if (filters.year) params.year = filters.year; 
 
     try {
       const res = await api.get("/requirements", { params });
@@ -52,9 +65,10 @@ export default function RequirementList({ user }) {
     }
   }
 
+  // 🆕 The useEffect now depends on the 'filters' state
   useEffect(() => {
     load();
-  }, []);
+  }, [filters]);
 
   const save = async (payload) => {
     const { refLinkText, refLinkUrl } = parseRef(payload.refId);
@@ -69,7 +83,7 @@ export default function RequirementList({ user }) {
       addedBy: payload.addedBy,
       orderId: editing?.orderId || "",
       orderedBy: editing?.orderedBy || "",
-      amount: payload.amount || 0, // 🆕 include amount
+      amount: payload.amount || 0,
     };
 
     try {
@@ -97,7 +111,7 @@ export default function RequirementList({ user }) {
       ...row,
       orderId: newOrderId,
       orderedBy: newOrderedBy,
-      amount: newAmount, // 🆕 update amount
+      amount: newAmount,
     });
     await load();
   };
@@ -160,7 +174,6 @@ export default function RequirementList({ user }) {
             </div>
           </div>
 
-          {/* 🆕 Filter by Month */}
           <div className="filter-group">
             <div className="filter-toggle">
               <span>Filter by Month</span>
@@ -189,7 +202,6 @@ export default function RequirementList({ user }) {
             </div>
           </div>
 
-          {/* 🆕 Filter by Year */}
           <div className="filter-group">
             <div className="filter-toggle">
               <span>Filter by Year</span>
@@ -201,9 +213,13 @@ export default function RequirementList({ user }) {
                   setFilters({ ...filters, year: e.target.value })
                 }
               >
-                <option value={new Date().getFullYear()}>{new Date().getFullYear()}</option>
-                <option value={(new Date().getFullYear() - 1).toString()}>{new Date().getFullYear() - 1}</option>
-                <option value={(new Date().getFullYear() + 1).toString()}>{new Date().getFullYear() + 1}</option>
+                <option value="">All Years</option>
+                {/* 🆕 Dynamically generate year options */}
+                {getAllYears().map(year => (
+                  <option key={year} value={year.toString()}>
+                    {year}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -229,13 +245,13 @@ export default function RequirementList({ user }) {
           <div className="filter-actions">
             <button
               onClick={() => {
-                setFilters({ user: "", date: "", status: "", month: "", year: new Date().getFullYear().toString() }); // reset with default year
-                load();
+                // 🆕 The filter state is reset. The useEffect will handle the load.
+                setFilters({ user: "", date: "", status: "", month: "", year: "" });
               }}
             >
               Reset
             </button>
-            <button onClick={() => load()}>Apply</button>
+            {/* <button onClick={() => load()}>Apply</button> */}
           </div>
         </div>
       </div>
