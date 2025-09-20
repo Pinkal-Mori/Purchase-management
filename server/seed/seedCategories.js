@@ -1,0 +1,247 @@
+// server/seedCategories.js
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import Category from "../models/Category.js";
+
+dotenv.config();
+
+const categories = [
+  {
+    name: "Embedded Solutions",
+    subcategories: [ "Development",
+        "Audio Speech",
+        "Ethernet",
+        "USB-RS232-Serial",
+        "RS485",
+        "Wireless Communication",
+        "LoRa",
+        "Barcode",
+        "ESP32 Series",
+        "ESP8266 Series",
+        "Remote Control",
+        "USB Host",
+        "Displays",
+        "Sensors",],
+  },
+  {
+    name: "Connectors",
+    subcategories: ["JST XH 2.5mm",
+        "JST PH 2.0mm",
+        "JST 1.25mm",
+        "FFC - FPC - 0.5mm",
+        "FFC - FPC - 1mm",
+        "Mini Fit",
+        "Berg 2.5mm",
+        "FRC IDC Flat Cable - Box Header",
+        "Header Strips",
+        "Screw Terminal Fixed",
+        "Screw Terminal Pluggable",
+        "Barrier Terminal Blocks",
+        "USB",
+        "JST VH 3.96mm",
+        "CPU CH 3.96mm",
+        "JST SM",
+        "Signals",
+        "Battery Holder",
+        "Power DC",
+        "Power AC",
+        "IC Socket",
+        "D-Type",
+        "Memory Card",
+        "SIM Card Holders",
+        "Banana Terminals",
+        "Round Shell",
+        "Audio Stereo",
+        "Video HDMI",
+        "RF Antenna",
+        "Ethernet",
+        "Wire to Wire",
+        "Wires",
+        "Wire Crimp Terminals",
+        "Ferrule (Bootlace)",
+        "Quick Disconnect Terminal",
+        "Waterproof Connectors",
+        "SATA HDD SSD",
+        "B2B Board to Board",],
+  },
+  {
+    name: "Switches",
+    subcategories: [ "6x6mm Size",
+        "12x12mm Size",
+        "4.5x4.5mm Size",
+        "4x4mm Size",
+        "3x6mm Size",
+        "6.5x6.5 Size",
+        "SMD Switches",
+        "12x12x7.3mm Size",
+        "6x6x7.3mm Size",
+        "Silent Switches",
+        "Switches with LEDs",
+        "6x6x7.2mm LED",
+        "7x7x7mm LED",
+        "Key Switch 17x12.5mm",
+        "Dome Switch",
+        "Slide Switches",
+        "DIP",
+        "Membrane / Matrix",
+        "Navigation",
+        "Rocker",
+        "Push ON/OFF",
+        "Panel Mount",
+        "Limit",
+        "Toggle",
+        "Key Switches",
+        "Thumbwheel Switch",
+        "Rotary Encoder",
+        "Tact Key Switch",],
+  },
+  {
+    name: "Cap and Knobs",
+    subcategories: [ "SW 6x6 R6.2",
+        "SW 6x6 R5.5",
+        "SW 6x6 R8 H10",
+        "SW 6x6 R8",
+        "SW 6x6 R10",
+        "SW 6x6 R7.5",
+        "Silicone R5.5",
+        "Silicone R6",
+        "Silicone R6.1",
+        "Silicone R6.4",
+        "Silicone R8",
+        "SW 12x12 R11.5",
+        "SW 12x12x7.3 R8.9",
+        "SW 12x12x7.3 S9.2",
+        "SW 12x12x7.3 S10",
+        "SW 12x12x7.3 S12",
+        "SW 12x12x7.3 R11.5",
+        "SW 6x6x7.3 R6.7",
+        "SW 6x6x7.3 R8",
+        "SW 6x6x7.3 R6",
+        "SW 4.5x4.5 R6x7",
+        "SW 4.5x4.5 R6x22",
+        "Switch Cap 3x2 Head",
+        "R13.6 Stem 3x2",
+        "Switch Cap 3.3 Square Head",
+        "SW LED 6x6x7.2 R10",
+        "Knob for Slide Switch",
+        "Knob",
+        "Knob - Bakelite",],
+  },
+  {
+    name: "Passive Components",
+    subcategories: [ "Inductors",
+        "Resistors SMD",
+        "Capacitors - SMD - MLCC",
+        "Capacitors - Through Hole - Electrolytic",
+        "Capacitors - SMD - Electrolytic",
+        "Variable Resistors",
+        "Potentiometer",
+        "Crystals",
+        "Transformers",
+        "Relays",
+        "Battery",
+        "MIC",
+        "Buzzer",
+        "Resistors Though Hole",],
+  },
+  {
+    name: "Active Components",
+    subcategories: ["Microcontroller",
+        "Megawin 8051",
+        "USB",
+        "Touch Sensing",
+        "Audio",
+        "Optocouplers",
+        "Opamp",
+        "Memory",
+        "Power Regulator",
+        "Various ICs",
+        "Triac",
+        "Mosfets",
+        "Transistors",
+        "Diodes & Rectifiers",
+        "Zener Diodes",],
+  },
+  {
+    name: "Power Supply",
+    subcategories: [ "AC to DC SMPS",
+        "DC-DC Step-Down Buck",
+        "DC-DC Step-Up Boost",
+        "DC-DC Step Up/Down Buck/Boost",
+        "Battery Charger",
+        "SSR",
+        "DC-DC Isolation",],
+  },
+  {
+    name: "Optoelectronics",
+    subcategories: [ "Displays",
+        "LED Indication",
+        "LED Lighting",
+        "Side SMD LED",
+        "Panel Indicators",],
+  },
+  {
+    name: "Prototyping & Testing",
+    subcategories: [ "ZIF Sockets & Test Clips",
+        "Adapter PCBs",
+        "Test Probes",
+        "Wire Test Hooks",
+        "Jumper Wires",
+        "3D Printing Filaments",],
+  },
+  {
+    name: "Circuit Protection",
+    subcategories: ["Fuse", "TVS/ESD/Surge", "EMI", "MOV/ZOV", "NTC"],
+  },
+  {
+    name: "Hardware",
+    subcategories: [ "PCB Standoff spacer",
+        "PCB Spacer - Threaded",
+        "PCB Spacer - Snap Fit",
+        "Spacers - Hex - M3 Threads",
+        "Spacers - Hex - No Threads",
+        "Nuts and Bolts",
+        "Screw Nut Plastic",
+        "Cable Glands",
+        "Heatsink",
+        "Protective",
+        "Enclosures",
+        "Tools Equipment",
+        "Heat Shrink Tubing",
+        "Door Latch",
+        "Drill Bits",],
+  },
+  {
+    name: "LED Accessories",
+    subcategories: ["LED Spacer", "LED Holder", "LED Light Guide"],
+  },
+  
+];
+
+ async function seedCategories() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    console.log("Connected to MongoDB");
+
+    for (const cat of categories) {
+      const existing = await Category.findOne({ name: cat.name });
+      if (!existing) {
+        await Category.create(cat);
+        console.log(`Inserted: ${cat.name}`);
+      } else {
+        console.log(`Already exists: ${cat.name}`);
+      }
+    }
+
+    console.log("Seeding done ✅");
+    mongoose.disconnect();
+  } catch (err) {
+    console.error("Error seeding categories:", err);
+    mongoose.disconnect();
+  }
+}
+export default seedCategories;

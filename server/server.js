@@ -2,8 +2,8 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
+// import path from "path";
+// import { fileURLToPath } from "url";
 import { connectDB } from "./config/db.js";
 
 
@@ -37,4 +37,8 @@ connectDB(process.env.MONGO_URI).then(async () => {
   // await seedCategories();
   app.listen(PORT, () => console.log("✅ Server on port", PORT));
 
-});
+})
+  .catch(err => {
+    console.error("Failed to connect to DB", err);
+    process.exit(1);
+  });
