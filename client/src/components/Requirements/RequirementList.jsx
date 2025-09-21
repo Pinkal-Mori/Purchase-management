@@ -17,11 +17,12 @@ function parseRef(refId) {
 
 export default function RequirementList({ user }) {
   const [items, setItems] = useState([]);
-  const [filters, setFilters] = useState({ user: "", date: "", status: "", month: "", year: "" }); // 🆕 default year is now empty string
+  const [filters, setFilters] = useState({ user: "", date: "", status: "", month: "", year: "" });
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [allYears, setAllYears] = useState([]); // 🆕 નવું સ્ટેટ
 
   // Load all users
   useEffect(() => {
@@ -36,26 +37,26 @@ export default function RequirementList({ user }) {
     fetchUsers();
   }, []);
 
-  // 🆕 Function to get all unique years from the data
-  const getAllYears = () => {
-    const years = new Set();
-    items.forEach(item => {
-      if (item.date) {
-        years.add(new Date(item.date).getFullYear());
+  // 🆕 બધા વર્ષો લોડ કરવા માટે નવો useEffect હૂક
+  useEffect(() => {
+    async function fetchYears() {
+      try {
+        const res = await api.get("/requirements/years"); // ⬅️ નવા બેકએન્ડ એન્ડપોઇન્ટનો ઉપયોગ
+        setAllYears(res.data);
+      } catch (e) {
+        console.error("Failed to load years", e);
       }
-    });
-    // Add the current year if it's not already in the data
-    years.add(new Date().getFullYear());
-    return Array.from(years).sort((a, b) => a - b);
-  };
+    }
+    fetchYears();
+  }, []); // The empty array ensures this runs only once
 
   async function load() {
     const params = {};
     if (filters.user) params.user = filters.user;
     if (filters.date) params.date = filters.date;
     if (filters.status) params.status = filters.status;
-    if (filters.month) params.month = filters.month; 
-    if (filters.year) params.year = filters.year; 
+    if (filters.month) params.month = filters.month;
+    if (filters.year) params.year = filters.year;
 
     try {
       const res = await api.get("/requirements", { params });
@@ -65,7 +66,7 @@ export default function RequirementList({ user }) {
     }
   }
 
-  // 🆕 The useEffect now depends on the 'filters' state
+  // The useEffect now depends on the 'filters' state
   useEffect(() => {
     load();
   }, [filters]);
@@ -122,7 +123,6 @@ export default function RequirementList({ user }) {
     await load();
   };
 
-  // Sidebar toggle
   const handleFilterToggle = () => setSidebarOpen((prev) => !prev);
   const handleFilterClose = () => setSidebarOpen(false);
 
@@ -134,7 +134,6 @@ export default function RequirementList({ user }) {
           onClick={handleFilterClose}
         />
       )}
-      {/* Sidebar */}
       <div className={`sidebar ${sidebarOpen ? "sidebar-open" : ""}`}>
         <div className="sidebar-header">
           <h3>Filters</h3>
@@ -214,8 +213,8 @@ export default function RequirementList({ user }) {
                 }
               >
                 <option value="">All Years</option>
-                {/* 🆕 Dynamically generate year options */}
-                {getAllYears().map(year => (
+                {/* 🆕 હવે allYears સ્ટેટનો ઉપયોગ થાય છે */}
+                {allYears.map(year => (
                   <option key={year} value={year.toString()}>
                     {year}
                   </option>
@@ -245,18 +244,15 @@ export default function RequirementList({ user }) {
           <div className="filter-actions">
             <button
               onClick={() => {
-                // 🆕 The filter state is reset. The useEffect will handle the load.
                 setFilters({ user: "", date: "", status: "", month: "", year: "" });
               }}
             >
               Reset
             </button>
-            {/* <button onClick={() => load()}>Apply</button> */}
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
       <div className={`content ${sidebarOpen ? "shrunk" : ""}`}>
         <div className="header2">
           <a href="/dashboard" className="back-btn">
@@ -304,7 +300,7 @@ export default function RequirementList({ user }) {
                   <th>Added By</th>
                   <th>Order ID</th>
                   <th>Ordered By</th>
-                  <th>Amount</th> 
+                  <th>Amount</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -406,7 +402,6 @@ export default function RequirementList({ user }) {
         </div>
       </div>
 
-      {/* Modal */}
       <RequirementForm
         open={modalOpen}
         onClose={() => {

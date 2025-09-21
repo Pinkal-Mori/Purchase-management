@@ -5,6 +5,8 @@ import { User } from "../models/User.js";
 import { auth } from "../middleware/auth.js";
 import { OAuth2Client } from "google-auth-library";
 import nodemailer from "nodemailer";
+import fs from "fs";
+import path from "path";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -311,6 +313,48 @@ router.post("/profile-image", auth, async (req, res) => {
   } catch (e) {
     console.error("Profile Image Update Error:", e);
     res.status(500).json({ message: "Failed to update profile image." });
+  }
+});
+
+// ✅ DELETE PROFILE IMAGE
+router.delete("/profile-image", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Handle Google accounts that have a profile picture from Google
+    if (user.signup_method === 'google') {
+      // If you want to remove Google image, set profileImage to null
+      user.profileImage = null;
+      await user.save();
+      return res.status(200).json({ message: "Google profile picture removed." });
+    }
+
+    if (!user.profileImage) {
+      return res.status(200).json({ message: "No profile image to delete." });
+    }
+    const imagePath = path.join(__dirname, '..', user.profileImage);
+
+    // Check if the file exists before trying to delete it
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+      console.log(`Successfully deleted file: ${imagePath}`);
+    } else {
+      console.warn(`File not found, but updating database: ${imagePath}`);
+    }
+
+    // Update the database to remove the profile image path
+    user.profileImage = null;
+    await user.save();
+
+    res.status(200).json({ message: "Profile picture deleted successfully." });
+
+  } catch (e) {
+    console.error("Delete Profile Image Error:", e);
+    res.status(500).json({ message: "Failed to delete profile picture." });
   }
 });
 

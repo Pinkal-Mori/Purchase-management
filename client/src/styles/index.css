@@ -189,6 +189,7 @@ input::placeholder {
 /* --- Password with Eye Icon --- */
 .password-input-container {
     position: relative;
+    margin-bottom: -6px;
 }
 
 .password-input-container input {
@@ -208,17 +209,6 @@ input::placeholder {
 } 
 .password-toggle-icon:hover{
     color:black;
-}
-
-.forgot-password {
-    color:#ff2424;
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-align: right;
-    display: block;
-    margin-top: -10px;
-    margin-bottom: 10px;
 }
 
 .forgot-password:hover {
@@ -281,13 +271,13 @@ input::placeholder {
     position: relative;
     font-size: 0.9rem;
     color: #aaa;
-    margin: 0.5rem 0;
+    margin-top: 1rem ;
 }
 .social-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    /* gap: 10px; */
     width: 100%;
     padding: 0.75rem;
     border: 1px solid #ddd;
@@ -302,6 +292,7 @@ input::placeholder {
 .social-btn:hover {
     background-color: #f8f9fa;
 }
+
 
 /* --- Responsive styles --- */
 @media (max-width: 600px) {

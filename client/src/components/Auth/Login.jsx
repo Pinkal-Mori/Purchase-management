@@ -77,20 +77,23 @@ export default function Login({ onSwitch }) {
             {showPassword ? <FaEyeSlash /> : <FaEye />}
           </span>
         </div>
+        
+      <div style={{ textAlign: "right" }}>
+        <button
+          type="button"
+          className="forgot-password"
+          style={{ background: "transparent", color: "#ff2424", cursor: "pointer", border: 0, padding: 0,marginBottom: 10 }}
+          onClick={() => setShowForgot(true)}
+        >
+          Forgot password 
+        </button>
+      </div>
+     
+
         <button className="btn" type="submit">
           Log In
         </button>
       </form>
-
-      <div style={{ marginTop: 10, textAlign: "right" }}>
-        <button
-          type="button"
-          style={{ background: "transparent", color: "#555", textDecoration: "underline", cursor: "pointer", border: 0, padding: 0 }}
-          onClick={() => setShowForgot(true)}
-        >
-          Forgot password?
-        </button>
-      </div>
 
       <div className="social-login">
         <div className="or-divider">Or</div>

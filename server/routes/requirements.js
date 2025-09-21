@@ -10,12 +10,16 @@ router.get("/", auth, async (req, res) => {
   const filter = {};
 
   if (user) filter.addedBy = new RegExp(user, "i");
-  if (date) filter.date = date;
+  // if (date) filter.date = date;
   if (status === "pending") filter.$or = [{ orderId: { $exists: false } }, { orderId: "" }];
   if (status === "placed") filter.orderId = { $exists: true, $ne: "" };
 
   // 🆕 Month/Year filter logic
-  if (month && year) {
+  if(date){
+     // Filter by a specific date
+      filter.date = date;
+  }
+  else if (month && year) {
     // date format: YYYY-MM-DD
     const regex = new RegExp(`^${year}-${month.padStart(2, "0")}`);
     filter.date = regex;
@@ -33,6 +37,34 @@ router.get("/", auth, async (req, res) => {
     res.json(list);
   } catch (err) {
     console.error("Error fetching requirements:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// GET /api/requirements/years
+router.get("/years", auth, async (req, res) => {
+  try {
+    const years = await Requirement.aggregate([
+      {
+        $group: {
+          _id: { $year: { $toDate: "$date" } } // ⬅️ અહીં ફેરફાર છે
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    const yearList = years.map(y => y._id);
+    const currentYear = new Date().getFullYear();
+    
+    if (!yearList.includes(currentYear)) {
+      yearList.push(currentYear);
+    }
+
+    res.json(yearList);
+  } catch (err) {
+    console.error("Error fetching unique years:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
