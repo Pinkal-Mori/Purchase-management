@@ -1,12 +1,6 @@
 // user.js
 import mongoose from "mongoose";
 
-const BucketSchema = new mongoose.Schema({
-  id: String,
-  title: String,
-  link: String,
-  image: String
-}, { _id: false });
 
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -14,8 +8,7 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: false },
   profileImage: String,
-  customWebsiteBuckets: [BucketSchema],
-  // અહીં નવા ફીલ્ડ ઉમેરવામાં આવ્યા છે
+ 
   signup_method: { 
     type: String, 
     required: true, 
