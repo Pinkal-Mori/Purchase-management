@@ -325,9 +325,8 @@ router.delete("/profile-image", auth, async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    // Handle Google accounts that have a profile picture from Google
+    // Handle Google accounts
     if (user.signup_method === 'google') {
-      // If you want to remove Google image, set profileImage to null
       user.profileImage = null;
       await user.save();
       return res.status(200).json({ message: "Google profile picture removed." });
@@ -336,17 +335,24 @@ router.delete("/profile-image", auth, async (req, res) => {
     if (!user.profileImage) {
       return res.status(200).json({ message: "No profile image to delete." });
     }
-    const imagePath = path.join(__dirname, '..', user.profileImage);
 
-    // Check if the file exists before trying to delete it
-    if (fs.existsSync(imagePath)) {
-      fs.unlinkSync(imagePath);
-      console.log(`Successfully deleted file: ${imagePath}`);
+    // ✅ Check if it's a local file path (not a URL or base64)
+    if (
+      !user.profileImage.startsWith("http") &&
+      !user.profileImage.startsWith("data:image")
+    ) {
+      const imagePath = path.join(process.cwd(), user.profileImage); // or __dirname if stored relative to script
+
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+        console.log(`Deleted file: ${imagePath}`);
+      } else {
+        console.warn(`File not found, but will continue: ${imagePath}`);
+      }
     } else {
-      console.warn(`File not found, but updating database: ${imagePath}`);
+      console.log("Profile image is a URL or base64; skipping file deletion.");
     }
 
-    // Update the database to remove the profile image path
     user.profileImage = null;
     await user.save();
 
@@ -357,6 +363,7 @@ router.delete("/profile-image", auth, async (req, res) => {
     res.status(500).json({ message: "Failed to delete profile picture." });
   }
 });
+
 
 // ✅ GET ALL USERS
 router.get("/all-users", auth, async (req, res) => {
