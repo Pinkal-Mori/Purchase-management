@@ -23,7 +23,7 @@ export default function Signup({ onSwitch }) {
       const message = error.response?.data?.message || error.message || "Signup failed";
       
       // Here's the new logic to handle the specific backend message
-      if (message.includes("Google વડે સાઇનઅપ કર્યું છે")) {
+      if (message.includes("Signed up with Google")) {
         toast.info("This email is already registered with Google. Please use the Google Sign-up button.");
       } else {
         toast.error(message);

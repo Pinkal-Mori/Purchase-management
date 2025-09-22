@@ -105,10 +105,10 @@ router.post("/signup", async (req, res) => {
     if (existingUser) {
       if (existingUser.signup_method === 'google') {
         return res.status(400).json({
-          message: "તમે Google વડે સાઇનઅપ કર્યું છે. કૃપા કરીને Google વડે લોગિન કરો."
+          message: "You signed up with Google. Please login using Google."
         });
       }
-      return res.status(400).json({ message: "આ ઇમેઇલ પહેલેથી જ રજીસ્ટર થયેલું છે." });
+      return res.status(400).json({ message: "This email is already registered." });
     }
 
     const hashed = await bcrypt.hash(password, 10);

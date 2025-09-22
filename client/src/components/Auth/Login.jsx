@@ -34,7 +34,7 @@ export default function Login({ onSwitch }) {
         toast.error("Don't have an account? Please sign up first.");
       } else if (status === 400) {
         // Here's the new logic
-        if (message && message.includes("Google વડે સાઇનઅપ કર્યું છે")) {
+        if (message && message.includes("Signed up with Google")) {
           toast.info("You signed up with Google. Please use the Google login button.");
         } else if (message?.toLowerCase().includes("password")) {
           toast.error("Invalid password.");

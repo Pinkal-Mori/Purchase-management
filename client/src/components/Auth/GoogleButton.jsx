@@ -22,7 +22,7 @@ export default function GoogleButton() {
             console.error("Google login failed:", err);
 
             // Here's the new logic to handle a specific error from the backend.
-            if (message.includes("Google વડે સાઇનઅપ કર્યું છે")) {
+            if (message.includes("Signed up with Google")) {
               toast.info("This email is already registered with a password. Please log in using your email and password.");
             } else {
               toast.error(message);
