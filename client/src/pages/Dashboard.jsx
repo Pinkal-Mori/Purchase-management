@@ -3,12 +3,24 @@ import Header from '../components/Layout/Header';
 import WebBucketList from '../components/WebBucket/WebBucketList';
 import WebBucketModal from '../components/WebBucket/WebBucketModal';
 import '../styles/web.css';
+import { useEffect } from 'react';
+import { toast } from 'react-toastify';
+
 
 export default function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const [toEdit, setToEdit] = useState(null);
   // Add a new state variable to trigger a refresh
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+useEffect(() => {
+  const justSignedUp = localStorage.getItem("justSignedUp");
+  if (justSignedUp === "true") {
+    toast.success("🎉 Welcome! Your account has been created.On this page, you can add new web site and share your requirements. even, you can view the  requirements of other.");
+    localStorage.removeItem("justSignedUp");
+  }
+}, []);
+
 
   const handleOpenAddModal = () => {
     setToEdit(null);

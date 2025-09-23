@@ -34,6 +34,7 @@ export default function Signup({ onSwitch }) {
     
     try {
       await signup({ name, contact, email, password });
+      localStorage.setItem("justSignedUp", "true"); // <-- ADD THIS LINE
       toast.success("Signup successful!");
       // redirect or close modal here
     } catch (error) {
