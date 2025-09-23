@@ -13,8 +13,25 @@ export default function Signup({ onSwitch }) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  // 🆕 નવું ફંક્શન જે માત્ર નંબરો જ સ્વીકારે
+  const handleContactChange = (e) => {
+    const value = e.target.value;
+    // રેગ્યુલર એક્સપ્રેશન જે માત્ર અંકોને સ્વીકારે
+    if (/^\d*$/.test(value)) {
+      setContact(value);
+    }
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
+
+    // 10-અંકનું વેલિડેશન (સબમિટ કરતી વખતે)
+    const contactNumberPattern = /^\d{10}$/;
+    if (!contactNumberPattern.test(contact)) {
+        toast.error("Please enter a valid 10-digit contact number.");
+        return; 
+    }
+    
     try {
       await signup({ name, contact, email, password });
       toast.success("Signup successful!");
@@ -22,7 +39,6 @@ export default function Signup({ onSwitch }) {
     } catch (error) {
       const message = error.response?.data?.message || error.message || "Signup failed";
       
-      // Here's the new logic to handle the specific backend message
       if (message.includes("Signed up with Google")) {
         toast.info("This email is already registered with Google. Please use the Google Sign-up button.");
       } else {
@@ -47,9 +63,9 @@ export default function Signup({ onSwitch }) {
         <div className="input-group">
           <input 
             type="tel" 
-            placeholder="Contact Number" 
+            placeholder="Contact Number (10 digits)" 
             value={contact} 
-            onChange={e => setContact(e.target.value)} 
+            onChange={handleContactChange} // 🆕 અહીં આ નવું ફંક્શન વાપરવામાં આવ્યું છે
             required 
           />
         </div>
@@ -86,6 +102,9 @@ export default function Signup({ onSwitch }) {
         <div className="or-divider">Or</div>
         <GoogleButton />
       </div>
+      <p className="switch-text">
+        Already have an account? <span onClick={onSwitch}>Login</span>
+      </p>
     </div>
   );
 }
