@@ -387,7 +387,7 @@ router.post("/forgot-password", async (req, res) => {
     if (!user) return res.json({ message: "If that account exists, an OTP has been sent." });
 
     if (user.signup_method === 'google') {
-      return res.json({ message: "This email uses Google sign-in. Use Google to login." });
+      return res.status(400).json({ message: "This email uses Google sign-in. Use Google to login." });
     }
 
     // Generate 6-digit OTP

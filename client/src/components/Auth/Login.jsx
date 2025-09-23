@@ -35,7 +35,9 @@ export default function Login({ onSwitch }) {
       } else if (status === 400) {
         // Here's the new logic
         if (message && message.includes("Signed up with Google")) {
-          toast.info("You signed up with Google. Please use the Google login button.");
+          toast.info(
+            "You signed up with Google. Please use the Google login button."
+          );
         } else if (message?.toLowerCase().includes("password")) {
           toast.error("Invalid password.");
         } else if (message?.toLowerCase().includes("required")) {
@@ -77,18 +79,24 @@ export default function Login({ onSwitch }) {
             {showPassword ? <FaEyeSlash /> : <FaEye />}
           </span>
         </div>
-        
-      <div style={{ textAlign: "right" }}>
-        <button
-          type="button"
-          className="forgot-password"
-          style={{ background: "transparent", color: "#ff2424", cursor: "pointer", border: 0, padding: 0,marginBottom: 10 }}
-          onClick={() => setShowForgot(true)}
-        >
-          Forgot password 
-        </button>
-      </div>
-     
+
+        <div style={{ textAlign: "right" }}>
+          <button
+            type="button"
+            className="forgot-password"
+            style={{
+              background: "transparent",
+              color: "#ff2424",
+              cursor: "pointer",
+              border: 0,
+              padding: 0,
+              marginBottom: 10,
+            }}
+            onClick={() => setShowForgot(true)}
+          >
+            Forgot password
+          </button>
+        </div>
 
         <button className="btn" type="submit">
           Log In
@@ -101,10 +109,31 @@ export default function Login({ onSwitch }) {
       </div>
 
       {showForgot && (
-        <div className="modal" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50 }}>
-          <div style={{ background: "#fff", padding: 20, borderRadius: 8, width: 360, maxWidth: "90%" }}>
+        <div
+          className="modal"
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 50,
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              padding: 20,
+              borderRadius: 8,
+              width: 360,
+              maxWidth: "90%",
+            }}
+          >
             <h3 style={{ margin: 0, marginBottom: 12 }}>Reset your password</h3>
-            <p style={{ marginTop: 0, color: "#666" }}>Enter your account email to receive an OTP.</p>
+            <p style={{ marginTop: 0, color: "#666" }}>
+              Enter your account email to receive an OTP.
+            </p>
             <input
               type="email"
               placeholder="Email"
@@ -112,20 +141,46 @@ export default function Login({ onSwitch }) {
               onChange={(e) => setForgotEmail(e.target.value)}
               style={{ width: "100%", padding: 10, marginTop: 8 }}
             />
-            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
-              <button onClick={() => setShowForgot(false)} className="btn" style={{ background: "#eee", color: "#333" }}>Cancel</button>
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                justifyContent: "flex-end",
+                marginTop: 16,
+              }}
+            >
+              <button
+                onClick={() => setShowForgot(false)}
+                className="btn"
+                style={{ background: "#eee", color: "#333" }}
+              >
+                Cancel
+              </button>
               <button
                 className="btn"
                 disabled={isSending || !forgotEmail}
                 onClick={async () => {
                   try {
                     setIsSending(true);
-                    await api.post("/auth/forgot-password", { email: forgotEmail });
-                    toast.success("If that account exists, an OTP has been sent to your email.");
+                    await api.post("/auth/forgot-password", {
+                      email: forgotEmail,
+                    });
+                    toast.success(
+                      "If that account exists, an OTP has been sent to your email."
+                    );
                     setShowForgot(false);
-                    navigate("/reset-password", { state: { email: forgotEmail } });
+                    navigate("/reset-password", {
+                      state: { email: forgotEmail },
+                    });
                   } catch (e) {
-                    toast.error(e.response?.data?.message || "Failed to send OTP");
+                    const msg = e.response?.data?.message;
+                    if (msg && msg.includes("Google")) {
+                      toast.info(
+                        "You signed up with Google. Please use the Google login button."
+                      );
+                    } else {
+                      toast.error(msg || "Failed to send OTP");
+                    }
                   } finally {
                     setIsSending(false);
                   }
