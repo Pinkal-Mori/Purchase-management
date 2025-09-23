@@ -102,9 +102,6 @@ export default function Signup({ onSwitch }) {
         <div className="or-divider">Or</div>
         <GoogleButton />
       </div>
-      <p className="switch-text">
-        Already have an account? <span onClick={onSwitch}>Login</span>
-      </p>
     </div>
   );
 }
