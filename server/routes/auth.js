@@ -380,30 +380,43 @@ router.get("/all-users", auth, async (req, res) => {
 router.post("/forgot-password", async (req, res) => {
   try {
     const { email } = req.body;
-    if (!email) return res.status(400).json({ message: "Email is required" });
 
-    const user = await User.findOne({ email });
-    // Always return success to avoid user enumeration
-    if (!user) return res.json({ message: "If that account exists, an OTP has been sent." });
-
-    if (user.signup_method === 'google') {
-      return res.status(400).json({ message: "This email uses Google sign-in. Use Google to login." });
+    if (!email) {
+      return res.status(400).json({ message: "Email is required." });
     }
 
-    // Generate 6-digit OTP
+    const user = await User.findOne({ email });
+
+    // ❌ If no user found — tell the user now
+    if (!user) {
+      return res.status(404).json({ message: "This email is not registered." });
+    }
+
+    // ❌ If Google signup — block
+    if (user.signup_method === "google") {
+      return res.status(400).json({
+        message: "You signed up using Google. Please use Google login.",
+      });
+    }
+
+    // ✅ Generate OTP and save
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     user.resetPasswordOTP = otp;
-    user.resetPasswordOTPExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    user.resetPasswordOTPExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
     await user.save();
 
+    // ✅ Send email
     await sendPasswordResetOTP(email, otp);
 
-    res.json({ message: "If that account exists, an OTP has been sent to your email." });
-  } catch (e) {
-    console.error("Forgot Password Error:", e && (e.stack || e.message || e));
-    res.status(500).json({ message: "Failed to send OTP." });
+    return res.status(200).json({
+      message: "An OTP has been sent to your email.",
+    });
+  } catch (err) {
+    console.error("Forgot Password Error:", err);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
 
 // ✅ VERIFY OTP
 router.post("/verify-otp", async (req, res) => {

@@ -174,12 +174,15 @@ export default function Login({ onSwitch }) {
                     });
                   } catch (e) {
                     const msg = e.response?.data?.message;
-                    if (msg && msg.includes("Google")) {
+
+                    if (msg?.includes("Google")) {
                       toast.info(
-                        "You signed up with Google. Please use the Google login button."
+                        "You signed up using Google. Please use the Google login button."
                       );
+                    } else if (msg?.includes("not registered")) {
+                      toast.error("This email is not registered.");
                     } else {
-                      toast.error(msg || "Failed to send OTP");
+                      toast.error(msg || "Failed to send OTP.");
                     }
                   } finally {
                     setIsSending(false);
