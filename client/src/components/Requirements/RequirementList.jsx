@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import RequirementForm from "./RequirementForm";
+import { Tooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css";
 
 function parseRef(refId) {
   if (!refId) return { refLinkText: "N/A", refLinkUrl: "" };
@@ -17,12 +19,19 @@ function parseRef(refId) {
 
 export default function RequirementList({ user }) {
   const [items, setItems] = useState([]);
-  const [filters, setFilters] = useState({ user: "", date: "", status: "", month: "", year: "" });
+  const [filters, setFilters] = useState({
+    user: "",
+    date: "",
+    status: "",
+    month: "",
+    year: "",
+  });
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [allYears, setAllYears] = useState([]); // 🆕 નવું સ્ટેટ
+  const [allYears, setAllYears] = useState([]);
+  const [loading, setLoading] = useState(false); // 🆕 લોડિંગ સ્ટેટ
 
   // Load all users
   useEffect(() => {
@@ -37,20 +46,21 @@ export default function RequirementList({ user }) {
     fetchUsers();
   }, []);
 
-  // 🆕 બધા વર્ષો લોડ કરવા માટે નવો useEffect હૂક
+  // બધા વર્ષો લોડ કરવા માટેનો useEffect હૂક
   useEffect(() => {
     async function fetchYears() {
       try {
-        const res = await api.get("/requirements/years"); // ⬅️ નવા બેકએન્ડ એન્ડપોઇન્ટનો ઉપયોગ
+        const res = await api.get("/requirements/years");
         setAllYears(res.data);
       } catch (e) {
         console.error("Failed to load years", e);
       }
     }
     fetchYears();
-  }, []); // The empty array ensures this runs only once
+  }, []);
 
   async function load() {
+    setLoading(true); // 🚀 ડેટા લોડ થવાનું શરૂ થાય ત્યારે true કરો
     const params = {};
     if (filters.user) params.user = filters.user;
     if (filters.date) params.date = filters.date;
@@ -63,6 +73,8 @@ export default function RequirementList({ user }) {
       setItems(res.data);
     } catch (err) {
       console.error("Failed to load requirements", err);
+    } finally {
+      setLoading(false); // ✅ ડેટા લોડ થઈ જાય પછી (ભલે સફળ હોય કે નિષ્ફળ) false કરો
     }
   }
 
@@ -94,6 +106,7 @@ export default function RequirementList({ user }) {
       setModalOpen(false);
       setEditing(null);
       await load();
+      alert("Requirement saved successfully!");
     } catch (err) {
       console.error("❌ Failed to save requirement:", err);
       let message = "Failed to save. Please check your input.";
@@ -104,17 +117,31 @@ export default function RequirementList({ user }) {
   };
 
   const updateRow = async (row, newOrderId, newOrderedBy, newAmount) => {
+    // ✅ Order ID માટે વેલિડેશન
     if (!newOrderId || newOrderId.trim() === "") {
       alert("⚠️ Please add an Order ID before saving!");
       return;
     }
-    await api.put(`/requirements/${row._id}`, {
-      ...row,
-      orderId: newOrderId,
-      orderedBy: newOrderedBy,
-      amount: newAmount,
-    });
-    await load();
+
+    // ✅ Amount માટે વેલિડેશન
+    if (isNaN(newAmount) || newAmount < 0) {
+      alert("⚠️ Please enter a valid amount.");
+      return;
+    }
+
+    try {
+      await api.put(`/requirements/${row._id}`, {
+        ...row,
+        orderId: newOrderId,
+        orderedBy: newOrderedBy,
+        amount: newAmount,
+      });
+      await load();
+      alert("Changes saved successfully!");
+    } catch (err) {
+      console.error("❌ Failed to update row:", err);
+      alert("Failed to save changes.");
+    }
   };
 
   const delRow = async (row) => {
@@ -129,10 +156,7 @@ export default function RequirementList({ user }) {
   return (
     <div className="main-container">
       {sidebarOpen && (
-        <div
-          className="sidebar-backdrop"
-          onClick={handleFilterClose}
-        />
+        <div className="sidebar-backdrop" onClick={handleFilterClose} />
       )}
       <div className={`sidebar ${sidebarOpen ? "sidebar-open" : ""}`}>
         <div className="sidebar-header">
@@ -213,8 +237,7 @@ export default function RequirementList({ user }) {
                 }
               >
                 <option value="">All Years</option>
-                {/* 🆕 હવે allYears સ્ટેટનો ઉપયોગ થાય છે */}
-                {allYears.map(year => (
+                {allYears.map((year) => (
                   <option key={year} value={year.toString()}>
                     {year}
                   </option>
@@ -244,7 +267,13 @@ export default function RequirementList({ user }) {
           <div className="filter-actions">
             <button
               onClick={() => {
-                setFilters({ user: "", date: "", status: "", month: "", year: "" });
+                setFilters({
+                  user: "",
+                  date: "",
+                  status: "",
+                  month: "",
+                  year: "",
+                });
               }}
             >
               Reset
@@ -286,7 +315,10 @@ export default function RequirementList({ user }) {
 
         <div id="requirementList">
           <h3>All Requirements:</h3>
-          {items.length === 0 ? (
+          {/* ✅ લોડિંગ સ્ટેટ મુજબ કન્ડિશનલ રેન્ડરિંગ */}
+          {loading ? (
+            <p>Loading...</p>
+          ) : items.length === 0 ? (
             <p>No requirements found.</p>
           ) : (
             <table>
@@ -371,10 +403,18 @@ export default function RequirementList({ user }) {
                               setEditing(req);
                               setModalOpen(true);
                             }}
+                            data-tooltip-id="edit-tip"
+                            data-tooltip-content="Edit"
                           >
                             ✏️
                           </button>
-                          <button onClick={() => delRow(req)}>🗑️</button>
+                          <button
+                            onClick={() => delRow(req)}
+                            data-tooltip-id="delete-tip"
+                            data-tooltip-content="Delete"
+                          >
+                            🗑️
+                          </button>
                           <button
                             onClick={() => {
                               const orderIdVal = document.getElementById(
@@ -386,8 +426,15 @@ export default function RequirementList({ user }) {
                               const amountVal = document.getElementById(
                                 `amount-${req._id}`
                               ).value;
-                              updateRow(req, orderIdVal, orderedByVal, amountVal);
+                              updateRow(
+                                req,
+                                orderIdVal,
+                                orderedByVal,
+                                amountVal
+                              );
                             }}
+                            data-tooltip-id="save-tip"
+                            data-tooltip-content="Save"
                           >
                             💾
                           </button>
@@ -399,6 +446,10 @@ export default function RequirementList({ user }) {
               </tbody>
             </table>
           )}
+          {/* ✅ Tooltip કમ્પોનન્ટ */}
+          <Tooltip id="edit-tip" />
+          <Tooltip id="delete-tip" />
+          <Tooltip id="save-tip" />
         </div>
       </div>
 
