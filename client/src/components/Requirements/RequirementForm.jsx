@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-
 // This line is correct. No changes needed here.
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -13,7 +12,9 @@ export default function RequirementForm({
 }) {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [newCategory, setNewCategory] = useState(""); // ✅ NEW
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
+  const [newSubcategory, setNewSubcategory] = useState(""); // ✅ NEW
   const [quantity, setQuantity] = useState("");
   const [note, setNote] = useState("");
   const [reason, setReason] = useState("");
@@ -22,7 +23,6 @@ export default function RequirementForm({
   const [addedBy, setAddedBy] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Function to fetch all categories from the backend
   const fetchCategories = async () => {
     try {
       setLoading(true);
@@ -34,21 +34,18 @@ export default function RequirementForm({
       setCategories(data);
     } catch (error) {
       console.error("Error fetching categories:", error);
-      // In case of an error, reset the categories to an empty array
       setCategories([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch categories when the form opens
   useEffect(() => {
     if (open) {
       fetchCategories();
     }
   }, [open]);
 
-  // Handle initialization or reset of form fields
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
     setDate(today);
@@ -66,6 +63,7 @@ export default function RequirementForm({
       setAddedBy(initial.addedBy || currentUser?.name || "");
     } else {
       setSelectedCategory("");
+      setNewCategory(""); // ✅ Reset new category
       setSelectedSubcategory("");
       setQuantity("");
       setNote("");
@@ -79,12 +77,31 @@ export default function RequirementForm({
     setLoading(true);
 
     try {
+      const categoryToUse =
+        selectedCategory === "__other__"
+          ? newCategory.trim()
+          : selectedCategory.trim();
+
+      const subcategoryToUse =
+        selectedSubcategory === "__other__"
+          ? newSubcategory.trim()
+          : selectedSubcategory.trim();
+
+      if (!categoryToUse) {
+        alert("Please select or enter a category.");
+        return;
+      }
+
+      if (!subcategoryToUse) {
+        alert("Please select or enter a subcategory.");
+        return;
+      }
+
       const payload = {
-        categoryName: selectedCategory.trim(),
-        subcategoryName: selectedSubcategory.trim() || undefined,
+        categoryName: categoryToUse,
+        subcategoryName: subcategoryToUse || undefined,
       };
 
-      // Send the data to the backend API
       const response = await fetch(`${API_BASE_URL}/categories`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -96,15 +113,8 @@ export default function RequirementForm({
         throw new Error(errorData.error || "Failed to save category data.");
       }
 
-      // Re-fetch the categories to update the list with the new data
       await fetchCategories();
 
-      // Proceed with saving the form data if both fields are not empty
-      if (!payload.categoryName || !payload.subcategoryName) {
-        alert("Please select or enter both a category and a subcategory.");
-        return;
-      }
-      
       onSave({
         part: `${payload.categoryName} / ${payload.subcategoryName}`,
         quantity,
@@ -115,14 +125,15 @@ export default function RequirementForm({
         addedBy,
       });
 
-      // Clear the form fields after successful save
+      // ✅ Reset form
       setSelectedCategory("");
+      setNewCategory("");
       setSelectedSubcategory("");
       setQuantity("");
       setNote("");
       setReason("");
       setRefId("");
-
+      setNewSubcategory("");
     } catch (error) {
       console.error("Error in handleSave:", error.message);
       alert(`An error occurred: ${error.message}`);
@@ -133,7 +144,12 @@ export default function RequirementForm({
 
   if (!open) return null;
 
-  const currentCategoryObj = categories.find((c) => c.name === selectedCategory);
+  const currentCategoryObj = categories.find(
+    (c) =>
+      typeof c.name === "string" &&
+      typeof selectedCategory === "string" &&
+      c.name.toLowerCase().trim() === selectedCategory.toLowerCase().trim()
+  );
 
   return (
     <div className="modal2" style={{ display: "flex" }} onClick={onClose}>
@@ -149,40 +165,83 @@ export default function RequirementForm({
           </div>
         )}
 
-        <input
-          type="text"
-          list="category-list"
+        {/* ✅ Category Dropdown with "Other" */}
+        <select
           value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          placeholder="Select or enter Category"
+          onChange={(e) => {
+            const value = e.target.value;
+            setSelectedCategory(value);
+            setSelectedSubcategory("");
+            if (value !== "__other__") {
+              setNewCategory("");
+            }
+          }}
           disabled={loading}
           required
-        />
-        <datalist id="category-list">
-          {categories.map((cat, idx) => (
-            <option key={idx} value={cat.name} />
-          ))}
-        </datalist>
+        >
+          <option value="">Select Category</option>
+          {categories
+            .filter(
+              (cat) => typeof cat.name === "string" && cat.name.trim() !== ""
+            )
+            .map((cat, idx) => (
+              <option key={idx} value={cat.name.trim()}>
+                {cat.name.trim()}
+              </option>
+            ))}
+          <option value="__other__">Other (Add New)</option>
+        </select>
 
+        {/* ✅ New Category Input if "Other" selected */}
+        {selectedCategory === "__other__" && (
+          <input
+            type="text"
+            placeholder="Enter New Category"
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            required
+            disabled={loading}
+          />
+        )}
+
+        {/* Subcategory Field (unchanged) */}
         {selectedCategory && (
           <>
-            <input
-              type="text"
-              list="subcategory-list"
+            <select
               value={selectedSubcategory}
-              onChange={(e) => setSelectedSubcategory(e.target.value)}
-              placeholder="Select or enter Subcategory"
+              onChange={(e) => {
+                const value = e.target.value;
+                setSelectedSubcategory(value);
+                if (value !== "__other__") {
+                  setNewSubcategory("");
+                }
+              }}
               disabled={loading}
               required
-            />
-            <datalist id="subcategory-list">
-              {currentCategoryObj?.subcategories.map((sub, idx) => (
-                <option key={idx} value={sub} />
+            >
+              <option value="">Select Subcategory</option>
+              {currentCategoryObj?.subcategories?.map((sub, idx) => (
+                <option key={idx} value={sub}>
+                  {sub}
+                </option>
               ))}
-            </datalist>
+              <option value="__other__">Other (Add New)</option>
+            </select>
+
+            {selectedSubcategory === "__other__" && (
+              <input
+                type="text"
+                placeholder="Enter New Subcategory"
+                value={newSubcategory}
+                onChange={(e) => setNewSubcategory(e.target.value)}
+                required
+                disabled={loading}
+              />
+            )}
           </>
         )}
 
+        {/* Quantity, Note, Reason, etc. */}
         <input
           type="number"
           placeholder="Quantity"
@@ -191,7 +250,6 @@ export default function RequirementForm({
           disabled={loading}
           required
         />
-        {/* ... (other form fields like note, reason, etc.) */}
         <textarea
           placeholder="Note"
           value={note}

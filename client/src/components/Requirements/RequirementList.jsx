@@ -122,7 +122,11 @@ export default function RequirementList({ user }) {
       alert("⚠️ Please add an Order ID before saving!");
       return;
     }
-
+    // ✅ Ordered By validation
+    if (!newOrderedBy || newOrderedBy.trim() === "") {
+      alert("⚠️ Please select who placed the order (Ordered By)!");
+      return;
+    }
     // ✅ Amount માટે વેલિડેશન
     if (isNaN(newAmount) || newAmount < 0) {
       alert("⚠️ Please enter a valid amount.");
@@ -377,7 +381,7 @@ export default function RequirementList({ user }) {
                       </td>
                       <td>
                         <select
-                          defaultValue={req.orderedBy || ""}
+                          defaultValue={req.orderedBy || user?.name || ""}
                           id={`orderedBy-${req._id}`}
                         >
                           <option value="">-Select User-</option>

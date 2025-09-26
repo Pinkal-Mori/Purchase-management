@@ -357,8 +357,6 @@ input::placeholder {
 .row-white { background-color: #f7f6f6; }    /* never viewed */
 .row-yellow { background-color: #eed80f; }   /* viewed by current user */
 .row-green { background-color: #c4efc1; }    /* order placed */
-
-/* Condition	Color
-Row user khud add kari che + not viewed yet	White
-Row user khud add kari che + viewed	Yellow
-Order placed (orderId exists)	Green */
+.row-green:hover{
+    background-color: #c4efc1;
+}
